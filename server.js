@@ -62,3 +62,31 @@ app.listen(PORT, function(){
 	console.log('Express listening on port ' + PORT);
 });
 
+app.put('/todos/:id', function(req, res){
+	var body = _.pick(req.body, 'description', 'completed');
+	var validAttributes = {};
+
+	if(body.hasOwnProperty('completed') && _.isBoolean(body.completed)){
+		validAttributes.completed = body.completed;
+	}else if (body.hasOwnProperty('completed')){
+		return res.status(400).send('completed must be a boolean');
+	}
+
+	if((body.hasOwnProperty('description') && _.isString(body.description) && body.description.trim().length > 0)){
+		validAttributes.description = body.description;
+	}else if(body.hasOwnProperty('description')){
+		return res.status(400).send('description must be a string');
+	}
+
+	var todoId = parseInt(req.params.id, 10);
+	var foundTodo = _.findWhere(todos, {id: todoId});
+
+	if(foundTodo){
+		var newTodo = _.extend(foundTodo, validAttributes);//Passed by reference
+
+		res.json(foundTodo);
+	}
+	else
+		res.status(404).json({"error":"no todo found for the provided id"}); 
+
+})
