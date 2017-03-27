@@ -17,11 +17,17 @@ app.get('/todos', function(req, res){
 	var queryParams = req.query;
 	var filteredTodos = todos;
 
-	var properties = _.pick(queryParams, 'completed');
+	var properties = _.pick(queryParams, 'completed', 'description');
 	if(properties.hasOwnProperty('completed') && properties.completed === 'true'){
 		filteredTodos = _.where(filteredTodos, {completed:true})
 	}else if (properties.hasOwnProperty('completed') && properties.completed === 'false'){
 		filteredTodos = _.where(filteredTodos, {completed:false})
+	}
+
+	if(properties.hasOwnProperty('description') && _.isString(properties.description) && properties.description.trim().length > 0){
+		filteredTodos = _.filter(filteredTodos, function(todo){
+			return todo.description.indexOf(properties.description) !== -1;
+		})
 	}
 
 	//if has property && completed === 'true'
