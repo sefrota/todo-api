@@ -79,61 +79,47 @@ app.delete('/todos/:id', function(req, res) {
 			id: todoId
 		}
 	}).then(function(rowsDel) {
-		if (rowsDel > 0){
+		if (rowsDel > 0) {
 			res.status(204).send();
-		}else{
-			res.status(404).send({message:'No todo was found'});
+		} else {
+			res.status(404).send({
+				message: 'No todo was found'
+			});
 		}
 	}, function(e) {
 		res.status(500).send();
 	});
 
-
-
-	/*var foundTodo = _.findWhere(todos, {
-		id: todoId
-	});
-
-	if (foundTodo) {
-		todos = _.without(todos, foundTodo);
-		res.json(foundTodo);
-	} else
-		res.status(404).json({
-			"error": "no todo found for the provided id"
-		});*/
 })
 
 
 
 app.put('/todos/:id', function(req, res) {
 	var body = _.pick(req.body, 'description', 'completed');
-	var validAttributes = {};
-
-	if (body.hasOwnProperty('completed') && _.isBoolean(body.completed)) {
-		validAttributes.completed = body.completed;
-	} else if (body.hasOwnProperty('completed')) {
-		return res.status(400).send('completed must be a boolean');
-	}
-
-	if ((body.hasOwnProperty('description') && _.isString(body.description) && body.description.trim().length > 0)) {
-		validAttributes.description = body.description;
-	} else if (body.hasOwnProperty('description')) {
-		return res.status(400).send('description must be a string');
-	}
-
+	var attributes = {};
 	var todoId = parseInt(req.params.id, 10);
-	var foundTodo = _.findWhere(todos, {
-		id: todoId
-	});
 
-	if (foundTodo) {
-		var newTodo = _.extend(foundTodo, validAttributes); //Passed by reference
+	if (body.hasOwnProperty('completed')) {
+		attributes.completed = body.completed;
+	}
 
-		res.json(foundTodo);
-	} else
-		res.status(404).json({
-			"error": "no todo found for the provided id"
-		});
+	if (body.hasOwnProperty('description')) {
+		attributes.description = body.description;
+	}
+
+	db.todo.findById(todoId).then(function(todo) {
+		if (todo) {
+			return todo.update(attributes);
+		} else {
+			res.status(404).send();
+		}
+	}, function() {
+		res.status(500).send();
+	}).then(function(todo) {
+		res.json(todo.toJSON());
+	}, function(e) {
+		res.status(400).json(e);
+	})
 
 })
 
