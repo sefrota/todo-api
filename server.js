@@ -71,6 +71,17 @@ app.post('/todos', function(req, res) {
 
 })
 
+app.post('/users', function(req, res) {
+	var body = _.pick(req.body, 'email', 'password');
+
+	db.user.create(body).then(function(user) {
+		res.json(user.toJSON());
+	}).catch(function(e) {
+		res.status(400).json(e);
+	});
+
+})
+
 app.delete('/todos/:id', function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
 

@@ -18,6 +18,7 @@ if (env === 'production') {//Only is production when it's deployed to Heroku
 var db = {};
 
 db.todo = sequelize.import(__dirname + '/modules/todo.js');
+db.user = sequelize.import(__dirname + '/modules/user.js');
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
