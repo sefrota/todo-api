@@ -141,7 +141,11 @@ app.post('/users/login', function(req, res){
 	var body = _.pick(req.body, 'email', 'password');
 
 	db.user.authenticate(body).then(function(user){
-		res.json(user.toPublicJSON());
+		var token = user.generateToken('authentication');
+		if(typeof token !== 'undefined')
+			res.header('Auth', token).json(user.toPublicJSON());
+		else
+			res.status(401).send();//Authentication is possible but failed - 401 - Unauthorized
 	}, function(){
 		res.status(401).send();//Authentication is possible but failed - 401 - Unauthorized
 	})
