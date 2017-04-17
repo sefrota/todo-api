@@ -21,5 +21,9 @@ db.todo = sequelize.import(__dirname + '/modules/todo.js');
 db.user = sequelize.import(__dirname + '/modules/user.js');
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
+//Associations
+db.todo.belongsTo(db.user);
+db.user.hasMany(db.todo);
+
 
 module.exports = db;
